@@ -14,7 +14,7 @@ if (!fs.existsSync("./projects.json")) {
 let projects = require("./projects.json");
 ; (async () => {
   if (args[0] === "project") {
-    if(!fs.existsSync("nest-deploy.sh")) return console.log("Please run `nest-deploy setup` first");
+    if (!fs.existsSync("nest-deploy.sh")) return console.log("Please run `nest-deploy setup` first");
     if (args[1] === "add") {
       let projectPath = args[2];
       projectPath = path.resolve(projectPath);
@@ -110,13 +110,27 @@ TimeoutStartSec=0
 WantedBy=default.target`);
     }
 
-    // make scriptexecutable
+    // make script executable
     await exec('chmod +x nest-deploy.sh');
 
     // enable service
     await exec('systemctl --user enable nest-deploy.service');
     // start srvice
     await exec('systemctl --user start nest-deploy.service');
+
+    // caddyfile
+    // check if entry already exists
+    let caddyfile = fs.readFileSync(`/home/${process.env.USER}/Caddyfile`, "utf8");
+    if (!caddyfile.includes(`deploy.${process.env.USER}.hackclub.app`)) {
+      caddyfile += `https://deploy.${process.env.USER}.hackclub.app {
+bind unix/.deploy.webserver.sock|777
+reverse_proxy 0.0.0.0:${port}
+    }`;
+      fs.writeFileSync(`/home/${process.env.USER}/Caddyfile`, caddyfile);
+
+      // reload caddy
+      await exec('systemctl --user reload caddy');
+    }
   }
   else {
     console.log("Commands:");
