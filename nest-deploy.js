@@ -110,6 +110,9 @@ TimeoutStartSec=0
 WantedBy=default.target`);
     }
 
+    // make scriptexecutable
+    await exec('chmod +x nest-deploy.sh');
+
     // enable service
     await exec('systemctl --user enable nest-deploy.service');
     // start srvice
