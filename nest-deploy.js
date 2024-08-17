@@ -113,11 +113,6 @@ WantedBy=default.target`);
     // make script executable
     await exec('chmod +x nest-deploy.sh');
 
-    // enable service
-    await exec('systemctl --user enable nest-deploy.service');
-    // start srvice
-    await exec('systemctl --user start nest-deploy.service');
-
     // caddyfile
     // check if entry already exists
     let caddyfile = fs.readFileSync(`/home/${process.env.USER}/Caddyfile`, "utf8");
@@ -129,7 +124,12 @@ reverse_proxy 0.0.0.0:${port}
       fs.writeFileSync(`/home/${process.env.USER}/Caddyfile`, caddyfile);
 
       // reload caddy
-      await exec('systemctl --user reload caddy');
+      await exec('systemctl --user reload caddy.service');
+
+    // enable service
+    await exec('systemctl --user enable nest-deploy.service');
+    // start srvice
+    await exec('systemctl --user start nest-deploy.service')
     }
   }
   else {
