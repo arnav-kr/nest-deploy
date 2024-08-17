@@ -14,6 +14,7 @@ if (!fs.existsSync("./projects.json")) {
 let projects = require("./projects.json");
 ; (async () => {
   if (args[0] === "project") {
+    if(!fs.existsSync("nest-deploy.sh")) return console.log("Please run `nest-deploy setup` first");
     if (args[1] === "add") {
       let projectPath = args[2];
       projectPath = path.resolve(projectPath);
@@ -29,11 +30,13 @@ let projects = require("./projects.json");
         stdout,
         stderr
       } = await exec('nest get_port');
-      if(stderr) return console.log(stderr);
+      if (stderr) return console.log(stderr);
 
       let port = stdout.match(/\d+/gm)[0];
-      projects.push({ id, token, path: projectPath, status: "stopped", port });
+      projects.push({ id, token, path: projectPath, status: "unknown", port });
       fs.writeFileSync(path.join(__dirname, "projects.json"), JSON.stringify(projects, null, 2));
+      console.log(`Deploy URL: https://deploy.${process.env.USER}.hackclub.app/${id}`);
+      console.log(`Deploy Token: ${token}`);
     }
     else if (args[1] === "remove") {
       const id = args[2];
@@ -58,32 +61,64 @@ let projects = require("./projects.json");
     }
     else {
       console.log("Commands:");
-      console.log("\tnest-deploy project add <path>");
-      console.log("\tnest-deploy project remove <id>");
-      console.log("\tnest-deploy project list");
+      console.log("    nest-deploy project add <path>");
+      console.log("    nest-deploy project remove <id>");
+      console.log("    nest-deploy project list");
     }
   }
-  else if (args[0] === "deploy") {
-    const id = args[1];
-    const project = projects.find(project => project.id === id);
-    if (!project) {
-      return console.log("Project not found");
-    }
-    const token = args[2];
-    if (token !== project.token) {
-      return console.log("Unauthorized");
-    }
+  else if (args[0] === "setup") {
+    let port;
     try {
-      // TODO: Deploy Project
-      console.log("Deployment Successful");
+      let {
+        stdout,
+        stderr
+      } = await exec('nest get_port');
+      port = stdout.match(/\d+/gm)[0];
     }
     catch (e) {
-      console.log("Deployment Failed");
+      return console.error("Failed to get a port");
     }
+
+    // add a free port to .env
+    if (!fs.existsSync(".env")) {
+      fs.writeFileSync(".env", `PORT=${port}`);
+    }
+
+    // create nest-deploy.sh
+    fs.writeFileSync("./nest-deploy.sh", `#!/usr/bin/env bash
+cd ${path.resolve("./")}
+npm install
+npm start
+`);
+
+    // create systemd service
+    if (!fs.existsSync("~/.config/systemd/user/nest-deploy.service")) {
+      if (!fs.existsSync("~/.config/systemd/user")) {
+        fs.mkdirSync("~/.config/systemd/user", { recursive: true });
+      }
+      fs.writeFileSync("~/.config/systemd/user/nest-deploy.service", `[Unit]
+Description=
+DefaultDependencies=no
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=${path.resolve("./nest-deploy.sh")}
+TimeoutStartSec=0
+
+[Install]
+WantedBy=default.target`);
+    }
+
+    // enable service
+    await exec('systemctl --user enable nest-deploy.service');
+    // start srvice
+    await exec('systemctl --user start nest-deploy.service');
   }
   else {
     console.log("Commands:");
-    console.log("\tnest-deploy project SUBCOMMAND");
-    console.log("\tnest-deploy deploy <id>");
+    console.log("    nest-deploy setup");
+    console.log("    nest-deploy project SUBCOMMAND");
+    console.log("    nest-deploy deploy <id>");
   }
 })();
