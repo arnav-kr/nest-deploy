@@ -11,15 +11,18 @@ runs:
     - name: Pull latest changes
       shell: bash
       id: pull
-      run: curl -sSH 'Authorization: ${{ inputs.deployToken }}' ${{ inputs.deployUrl }}/pull
+      run: |
+        curl -sSH 'Authorization: ${{ inputs.deployToken }}' ${{ inputs.deployUrl }}/pull
     - name: Build Docker image
       shell: bash
       id: build
-      run: curl -sSH 'Authorization: ${{ inputs.deployToken }}' ${{ inputs.deployUrl }}/build
+      run: |
+        curl -sSH 'Authorization: ${{ inputs.deployToken }}' ${{ inputs.deployUrl }}/build
     - name: Deploy Docker image
       shell: bash
       id: deploy
-      run: curl -sSH 'Authorization: ${{ inputs.deployToken }}' ${{ inputs.deployUrl }}/run
+      run: |
+        curl -sSH 'Authorization: ${{ inputs.deployToken }}' ${{ inputs.deployUrl }}/run
 inputs:
   deployToken:
     description: "Your Project Deploy Token from nest-deploy cli"
