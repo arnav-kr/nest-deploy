@@ -47,7 +47,7 @@ fastify.get('/:project/:action', async (request, reply) => {
       }
       // else run new container
       else {
-        spawn("docker", ["run", "-d", "--name", project.id, "-p", `${project.port}:${process.env.PORT}`, project.id], { encoding: 'utf8', cwd: project.path });
+        spawn("docker", ["run", "-d", "--name", project.id, "-p", `${project.port}:3000`, project.id], { encoding: 'utf8', cwd: project.path });
         return "Started Container";
       }
     }
