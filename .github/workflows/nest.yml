@@ -1,0 +1,17 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy to Nest
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run
+        uses: ./
+        with:
+          deployUrl: ${{ secrets.DEPLOY_URL }}
+          deployToken: ${{ secrets.DEPLOY_TOKEN }}

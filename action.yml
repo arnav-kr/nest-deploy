@@ -1,0 +1,42 @@
+name: "Deploy to Nest"
+author: "Arnav Kumar"
+branding:
+  icon: "feather"
+  color: "black"
+description: "Deploy to your Nest instance as a Docker container"
+
+runs:
+  using: composite
+  steps:
+    - name: Pull latest changes
+      shell: bash
+      id: pull
+      run: |
+        echo "::set-output name=pull-output::$(curl -H 'Authorization: ${{ inputs.deployToken }}' ${{ inputs.deployUrl }}/pull)" >> $GITHUB_OUTPUT
+    - name: Build Docker image
+      shell: bash
+      id: build
+      run: |
+        echo "::set-output name=build-output::$(curl -H 'Authorization: ${{ inputs.deployToken }}' ${{ inputs.deployUrl }}/build)" >> $GITHUB_OUTPUT
+    - name: Deploy Docker image
+      shell: bash
+      id: deploy
+      run: |
+        echo "::set-output name=deployment-status::$(curl -H 'Authorization: ${{ inputs.deployToken }}' ${{ inputs.deployUrl }}/run)" >> $GITHUB_OUTPUT
+inputs:
+  deployToken:
+    description: "Your Project Deploy Token from nest-deploy cli"
+    required: true
+  deployUrl:
+    description: "Your Project Deploy URL from nest-deploy cli"
+    required: true
+outputs:
+  pull-output:
+    description: "The output of the git pull command (comes from stdout)"
+    value: "${{ steps.pull.outputs.pull-output }}"
+  build-output:
+    description: "Docker build output"
+    value: "${{ steps.build.outputs.build-output }}"
+  deployment-status:
+    description: "If the deployment was successful or not"
+    value: "${{ steps.deploy.outputs.deployment-status }}"
