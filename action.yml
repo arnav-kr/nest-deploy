@@ -12,17 +12,17 @@ runs:
       shell: bash
       id: pull
       run: |
-        echo "::set-output name=pull-output::$(curl -H 'Authorization: ${{ inputs.deployToken }}' ${{ inputs.deployUrl }}/pull)" >> $GITHUB_OUTPUT
+        echo "pull-output=$(curl -sSH 'Authorization: ${{ inputs.deployToken }}' ${{ inputs.deployUrl }}/pull)" >> "$GITHUB_OUTPUT"
     - name: Build Docker image
       shell: bash
       id: build
       run: |
-        echo "::set-output name=build-output::$(curl -H 'Authorization: ${{ inputs.deployToken }}' ${{ inputs.deployUrl }}/build)" >> $GITHUB_OUTPUT
+        echo "build-output=$(curl -sSH 'Authorization: ${{ inputs.deployToken }}' ${{ inputs.deployUrl }}/build)" >> "$GITHUB_OUTPUT"
     - name: Deploy Docker image
       shell: bash
       id: deploy
       run: |
-        echo "::set-output name=deployment-status::$(curl -H 'Authorization: ${{ inputs.deployToken }}' ${{ inputs.deployUrl }}/run)" >> $GITHUB_OUTPUT
+        echo "deployment-status=$(curl -sSH 'Authorization: ${{ inputs.deployToken }}' ${{ inputs.deployUrl }}/run)" >> "$GITHUB_OUTPUT"
 inputs:
   deployToken:
     description: "Your Project Deploy Token from nest-deploy cli"
