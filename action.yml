@@ -11,21 +11,15 @@ runs:
     - name: Pull latest changes
       shell: bash
       id: pull
-      run: |
-          pull_response=$(curl -sSH 'Authorization: ${{ inputs.deployToken }}' ${{ inputs.deployUrl }}/pull)
-          echo 'pull-output=$pull_response' >> "$GITHUB_OUTPUT"
+      run: curl -sSH 'Authorization: ${{ inputs.deployToken }}' ${{ inputs.deployUrl }}/pull
     - name: Build Docker image
       shell: bash
       id: build
-      run: |
-          build_response=$(curl -sSH 'Authorization: ${{ inputs.deployToken }}' ${{ inputs.deployUrl }}/build)
-          echo 'build-output=$build_response' >> "$GITHUB_OUTPUT"
+      run: curl -sSH 'Authorization: ${{ inputs.deployToken }}' ${{ inputs.deployUrl }}/build
     - name: Deploy Docker image
       shell: bash
       id: deploy
-      run: |
-          deploy_response=$(curl -sSH 'Authorization: ${{ inputs.deployToken }}' ${{ inputs.deployUrl }}/run)
-          echo 'deployment-status=$deploy_response' >> "$GITHUB_OUTPUT"
+      run: curl -sSH 'Authorization: ${{ inputs.deployToken }}' ${{ inputs.deployUrl }}/run
 inputs:
   deployToken:
     description: "Your Project Deploy Token from nest-deploy cli"
@@ -33,13 +27,3 @@ inputs:
   deployUrl:
     description: "Your Project Deploy URL from nest-deploy cli"
     required: true
-outputs:
-  pull-output:
-    description: "The output of the git pull command (comes from stdout)"
-    value: "${{ steps.pull.outputs.pull-output }}"
-  build-output:
-    description: "Docker build output"
-    value: "${{ steps.build.outputs.build-output }}"
-  deployment-status:
-    description: "If the deployment was successful or not"
-    value: "${{ steps.deploy.outputs.deployment-status }}"
