@@ -92,11 +92,11 @@ npm start
 `);
 
     // create systemd service
-    if (!fs.existsSync("~/.config/systemd/user/nest-deploy.service")) {
-      if (!fs.existsSync("~/.config/systemd/user")) {
-        fs.mkdirSync("~/.config/systemd/user", { recursive: true });
+    if (!fs.existsSync(path.resolve("~/.config/systemd/user/nest-deploy.service"))) {
+      if (!fs.existsSync(path.resolve("~/.config/systemd/user"))) {
+        fs.mkdirSync(path.resolve("~/.config/systemd/user"), { recursive: true });
       }
-      fs.writeFileSync("~/.config/systemd/user/nest-deploy.service", `[Unit]
+      fs.writeFileSync(path.resolve("~/.config/systemd/user/nest-deploy.service"), `[Unit]
 Description=
 DefaultDependencies=no
 After=network-online.target
