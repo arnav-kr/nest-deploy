@@ -56,7 +56,7 @@ let projects = require("./projects.json");
     \x1b[90mDeploy URL:\x1b[0m https://deploy.${process.env.USER}.hackclub.app/${project.id}
     \x1b[90mDeploy Token:\x1b[0m ${project.token}
     \x1b[90mPort:\x1b[0m ${project.port}
-    \x1b[90mStatus:\x1b[0m ${project.status === "stopped" ? "\x1b[31m" : "\x1b32m"}${project.status}\x1b[0m`
+    \x1b[90mStatus:\x1b[0m ${project.status === "stopped" ? "\x1b[31m" : "\x1b[32m"}${project.status}\x1b[0m`
       )).join("\n"));
     }
     else {
