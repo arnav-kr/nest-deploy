@@ -48,11 +48,11 @@ let projects = require("./projects.json");
     }
     else if (args[1] === "list") {
       console.log(projects.map(project => (
-        // ansi styled red \x1b[
         `\x1b[34m${project.id}\x1b[0m
-\t\x1b[30mPath:\x1b[0m ${project.path}
-\t\x1b[30mDeploy Token:\x1b[0m ${project.token}
-\t\x1b[30mStatus:\x1b[0m ${project.status === "stopped" ? "\x1b[31m" : "\x1b32m"}${project.status}\x1b[0m`
+    \x1b[90mPath:\x1b[0m ${project.path}
+    \x1b[90mDeploy Token:\x1b[0m ${project.token}
+    \x1b[90mPort:\x1b[0m ${project.port}
+    \x1b[90mStatus:\x1b[0m ${project.status === "stopped" ? "\x1b[31m" : "\x1b32m"}${project.status}\x1b[0m`
       )).join("\n"));
     }
     else {
