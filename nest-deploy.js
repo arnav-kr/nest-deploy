@@ -117,7 +117,7 @@ WantedBy=default.target`);
     // check if entry already exists
     let caddyfile = fs.readFileSync(`/home/${process.env.USER}/Caddyfile`, "utf8");
     if (!caddyfile.includes(`deploy.${process.env.USER}.hackclub.app`)) {
-      caddyfile += `https://deploy.${process.env.USER}.hackclub.app {
+      caddyfile += `http://deploy.${process.env.USER}.hackclub.app {
 bind unix/.deploy.webserver.sock|777
 reverse_proxy 0.0.0.0:${port}
     }`;
