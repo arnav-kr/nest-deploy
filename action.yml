@@ -12,29 +12,23 @@ runs:
       shell: bash
       id: pull
       run: |
-        {
-          echo 'pull-output<<EOF'
-          curl -sSH 'Authorization: ${{ inputs.deployToken }}' ${{ inputs.deployUrl }}/pull
-          echo EOF
-        } >> "$GITHUB_OUTPUT"
+          echo 'pull-output<<EOF' >> "$GITHUB_OUTPUT"
+          echo "$(curl -sSH 'Authorization: ${{ inputs.deployToken }}' ${{ inputs.deployUrl }}/pull)" >> "$GITHUB_OUTPUT"
+          echo 'EOF' >> "$GITHUB_OUTPUT"
     - name: Build Docker image
       shell: bash
       id: build
       run: |
-        {
-          echo 'deployment-status<<EOF'
-          curl -sSH 'Authorization: ${{ inputs.deployToken }}' ${{ inputs.deployUrl }}/build
-          echo EOF
-        } >> "$GITHUB_OUTPUT"
+          echo 'deployment-status<<EOF' >> "$GITHUB_OUTPUT"
+          echo "$(curl -sSH 'Authorization: ${{ inputs.deployToken }}' ${{ inputs.deployUrl }}/build)" >> "$GITHUB_OUTPUT"
+          echo EOF >> "$GITHUB_OUTPUT"
     - name: Deploy Docker image
       shell: bash
       id: deploy
       run: |
-        {
-          echo 'pull-output<<EOF'
-          curl -sSH 'Authorization: ${{ inputs.deployToken }}' ${{ inputs.deployUrl }}/run
-          echo EOF
-        } >> "$GITHUB_OUTPUT"
+          echo 'pull-output<<EOF' >> "$GITHUB_OUTPUT"
+          echo "$(curl -sSH 'Authorization: ${{ inputs.deployToken }}' ${{ inputs.deployUrl }}/run)" >> "$GITHUB_OUTPUT"
+          echo EOF >> "$GITHUB_OUTPUT"
 inputs:
   deployToken:
     description: "Your Project Deploy Token from nest-deploy cli"
