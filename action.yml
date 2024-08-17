@@ -12,31 +12,28 @@ runs:
       shell: bash
       id: pull
       run: |
-        delimiter="$(openssl rand -hex 8)"
         {
-        echo 'pull-output<<${delimiter}'
-        curl -sSH 'Authorization: ${{ inputs.deployToken }}' ${{ inputs.deployUrl }}/pull
-        echo '${delimiter}'
+          echo 'pull-output<<EOF'
+          curl -sSH 'Authorization: ${{ inputs.deployToken }}' ${{ inputs.deployUrl }}/pull
+          echo EOF
         } >> "$GITHUB_OUTPUT"
     - name: Build Docker image
       shell: bash
       id: build
       run: |
-        delimiter="$(openssl rand -hex 8)"
         {
-        echo 'deployment-status<<${delimiter}'
-        curl -sSH 'Authorization: ${{ inputs.deployToken }}' ${{ inputs.deployUrl }}/build
-        echo '${delimiter}'
+          echo 'deployment-status<<EOF'
+          curl -sSH 'Authorization: ${{ inputs.deployToken }}' ${{ inputs.deployUrl }}/build
+          echo EOF
         } >> "$GITHUB_OUTPUT"
     - name: Deploy Docker image
       shell: bash
       id: deploy
       run: |
-        delimiter="$(openssl rand -hex 8)"
         {
-        echo 'pull-output<<${delimiter}'
-        curl -sSH 'Authorization: ${{ inputs.deployToken }}' ${{ inputs.deployUrl }}/run
-        echo '${delimiter}'
+          echo 'pull-output<<EOF'
+          curl -sSH 'Authorization: ${{ inputs.deployToken }}' ${{ inputs.deployUrl }}/run
+          echo EOF
         } >> "$GITHUB_OUTPUT"
 inputs:
   deployToken:
