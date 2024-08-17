@@ -31,10 +31,17 @@ fastify.get('/:project/:action', async (request, reply) => {
     // run container
     else if (action === "run") {
       // check for existing container
-      let existCheckOut = await exec(`docker ps -a | grep ${project.id}`);
+      let exists = false;
+      try {
+        let existCheckOut = await exec(`docker ps -a | grep ${project.id}`);
+        exists = true
+      }
+      catch (e) {
+        exists = false;
+      }
 
       // restart if exists
-      if (existCheckOut.stdout.length > 0) {
+      if (exists) {
         spawn("docker", ["restart", project.id], { encoding: 'utf8', cwd: project.path });
         return "Restarted Container";
       }
