@@ -30,25 +30,17 @@ fastify.get('/:project/:action', async (request, reply) => {
     }
     // run container
     else if (action === "run") {
-      // check for existing container
-      let exists = false;
       try {
-        let existCheckOut = await exec(`docker ps -a | grep ${project.id}`);
-        exists = true
+        // stop container
+        await exec(`docker stop ${project.id}`);
+        // remove conatiner
+        await exec(`docker rm ${project.id}`);
+        // run new container
+        await exec(`docker run -d --name ${project.id} -p ${project.port}:${project.internalPort || 3000} ${project.id}`, { cwd: project.path });
+        return "Started Container";
       }
       catch (e) {
-        exists = false;
-      }
-
-      // restart if exists
-      if (exists) {
-        spawn("docker", ["restart", project.id], { encoding: 'utf8', cwd: project.path });
-        return "Restarted Container";
-      }
-      // else run new container
-      else {
-        spawn("docker", ["run", "-d", "--name", project.id, "-p", `${project.port}:3000`, project.id], { encoding: 'utf8', cwd: project.path });
-        return "Started Container";
+        return "An error occurred while creating container";
       }
     }
     else {

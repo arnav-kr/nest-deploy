@@ -33,10 +33,12 @@ let projects = require("./projects.json");
       if (stderr) return console.log(stderr);
 
       let port = stdout.match(/\d+/gm)[0];
-      projects.push({ id, token, path: projectPath, status: "unknown", port });
+      let internalPort = 3000;
+      let project = { id, token, path: projectPath, port, internalPort };
+      projects.push(project);
       fs.writeFileSync(path.join(__dirname, "projects.json"), JSON.stringify(projects, null, 2));
       console.log(`Deploy URL: https://deploy.${process.env.USER}.hackclub.app/${id}`);
-      console.log(`Deploy Token: ${token}`);
+      logProjectDetails(project);
     }
     else if (args[1] === "remove") {
       const id = args[2];
@@ -44,20 +46,32 @@ let projects = require("./projects.json");
       if (index !== -1) {
         projects.splice(index, 1);
         fs.writeFileSync(path.join(__dirname, "projects.json"), JSON.stringify(projects, null, 2));
+        // stop and remove container
+        await exec(`docker stop ${id}`);
+        await exec(`docker rm ${id}`);
+        console.log("Project removed");
       }
       else {
         console.log("Project not found");
       }
     }
+    else if (args[1] === "status") {
+      const id = args[2];
+      const project = projects.find(project => project.id === id);
+      if (!project) {
+        return console.log("Project not found");
+      }
+      let {
+        stdout,
+        stderr
+      } = await exec(`docker ps -a --filter name=${project.id}`);
+      if (stderr) return console.log(stderr);
+      console.log(stdout);
+    }
     else if (args[1] === "list") {
-      console.log(projects.map(project => (
-        `\x1b[34m${project.id}\x1b[0m
-    \x1b[90mPath:\x1b[0m ${project.path}
-    \x1b[90mDeploy URL:\x1b[0m https://deploy.${process.env.USER}.hackclub.app/${project.id}
-    \x1b[90mDeploy Token:\x1b[0m ${project.token}
-    \x1b[90mPort:\x1b[0m ${project.port}
-    \x1b[90mStatus:\x1b[0m ${project.status === "stopped" ? "\x1b[31m" : "\x1b[32m"}${project.status}\x1b[0m`
-      )).join("\n"));
+      for(let project of projects) {
+        logProjectDetails(project);
+      }
     }
     else {
       console.log("Commands:");
@@ -87,6 +101,7 @@ let projects = require("./projects.json");
     // create nest-deploy.sh
     fs.writeFileSync("./nest-deploy.sh", `#!/usr/bin/env bash
 cd ${path.resolve("./")}
+git pull
 npm install
 npm start
 `);
@@ -118,18 +133,18 @@ WantedBy=default.target`);
     let caddyfile = fs.readFileSync(`/home/${process.env.USER}/Caddyfile`, "utf8");
     if (!caddyfile.includes(`deploy.${process.env.USER}.hackclub.app`)) {
       caddyfile += `http://deploy.${process.env.USER}.hackclub.app {
-bind unix/.deploy.webserver.sock|777
-reverse_proxy 0.0.0.0:${port}
-    }`;
+    bind unix/.deploy.webserver.sock|777
+    reverse_proxy 0.0.0.0:${port}
+}`;
       fs.writeFileSync(`/home/${process.env.USER}/Caddyfile`, caddyfile);
 
       // reload caddy
       await exec('systemctl --user reload caddy.service');
-
-    // enable service
-    await exec('systemctl --user enable nest-deploy.service');
-    // start srvice
-    await exec('systemctl --user start nest-deploy.service')
+      
+      // enable service
+      await exec('systemctl --user enable nest-deploy.service');
+      // start srvice
+      await exec('systemctl --user start nest-deploy.service')
     }
   }
   else {
@@ -139,3 +154,13 @@ reverse_proxy 0.0.0.0:${port}
     console.log("    nest-deploy deploy <id>");
   }
 })();
+
+function logProjectDetails(project) {
+  console.log(`\x1b[34m${project.id}\x1b[0m
+    \x1b[90mPath:\x1b[0m ${project.path}
+    \x1b[90mDeploy URL:\x1b[0m https://deploy.${process.env.USER}.hackclub.app/${project.id}
+    \x1b[90mDeploy Token:\x1b[0m ${project.token}
+    \x1b[90mPort:\x1b[0m ${project.port}
+    \x1b[90mInternal Port:\x1b[0m ${project.internalPort || 3000}`
+  );
+}

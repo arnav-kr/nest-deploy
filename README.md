@@ -1,3 +1,5 @@
+<img src="hatching-chick.gif" alt="Nest Deply" height="128">
+
 # nest-deploy
 
 A Utility for Deploying Docker Containers to Nest Instance

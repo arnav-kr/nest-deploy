@@ -1,6 +1,6 @@
 {
   "name": "nest-deploy",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Nest Deploy Manager",
   "bin": "nest-deploy.js",
   "main": "index.js",
