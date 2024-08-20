@@ -1,4 +1,4 @@
-<img src="hatching-chick.gif" alt="Nest Deploy" height="128">
+<img src="https://github.com/arnav-kr/nest-deploy/raw/main/hatching-chick.gif?raw=true" alt="Nest Deploy" height="128">
 
 # nest-deploy
 
@@ -34,7 +34,7 @@ Note down the `Deploy URL` and `Deploy Token` of your project,
 > Deploy Token is meant to be confidential
 
 ### On GitHub Repo
-1. copy the [.github/workflows/nest.yml](/.github/workflows/nest.yml) file to your repo
+1. copy the [.github/workflows/nest.yml](https://github.com/arnav-kr/nest-deploy/blob/main/.github/workflows/nest.yml) file to your repo
 2. in the environment settings of repo add the `DEPLOY_URL` and `DEPLOY_TOKEN` of your project in environment secrets of `nest` environment
 3. the deploy action will run whenever code is pushed to main branch and restart the project container running on the nest instance with the latest changes.
 
@@ -52,4 +52,4 @@ node ./nest-deploy.js project help
 Arnav Kumar [@arnav-kr](https://github.com/arnav-kr)
 
 ## LICENSE
-[AGPL-3.0](LICENSE)
+[AGPL-3.0](https://github.com/arnav-kr/nest-deploy/blob/main/LICENSE)
